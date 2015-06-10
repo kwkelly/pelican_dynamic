@@ -72,6 +72,24 @@ def add_tags(gen, metadata):
         d3_script = '<script src="http://d3js.org/d3.v3.min.js"></script>'
         metadata['scripts'].insert(0, d3_script)
 
+    if 'javascript_libs' in metadata:
+        js_libs = [x.strip() for x in metadata['javascript_libs'].split(',')]
+
+        lib_map = {'d3': 'http://d3js.org/d3.v3.min.js',
+                   'proj4': 'http://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.2/proj4.js',
+                   'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js',
+                   'highmaps': 'http://code.highcharts.com/maps/highmaps.js',
+                   'highcharts': 'http://code.highcharts.com/highcharts.js'}
+
+        to_prepend = []
+        for js_lib in js_libs:
+            if js_lib.startswith('http://') or js_lib.startswith('https://'):
+                link = js_lib
+            elif js_lib in lib_map:
+                link = lib_map[js_lib]
+            to_prepend.append('<script src="%s"></script>' % link)
+        metadata['scripts'] = to_prepend + metadata['scripts']
+
 def move_resources(gen):
     """
     Move files from js/css folders to output folder
